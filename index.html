@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>George Li · a little storybook</title>
+<meta name="description" content="George Li — CS Honors at Purdue. I build small worlds: AI agents, factory dashboards, flight routes and Roblox games.">
+<meta property="og:title" content="George Li · a little storybook">
+<meta property="og:description" content="CS Honors @ Purdue · prev. Sola AI (YC S23), Subaru · builder of small worlds.">
+<meta property="og:image" content="assets/rave-1_club.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..800;1,9..144,300..700&family=VT323&display=swap" rel="stylesheet">
+<style>
+  /* ---------- palette: soft cottage + faded y2k ---------- */
+  :root{
+    --parchment:#f6efe0;
+    --paper:#fbf7ee;
+    --ink:#3b2f2a;          /* espresso, never pure black */
+    --ink-soft:#6b5a50;
+    --matcha:#b9cba0;
+    --matcha-deep:#7f9a6a;
+    --rose:#e8b8b0;
+    --rose-deep:#c9877d;
+    --lavender:#cdc3e3;
+    --lavender-deep:#9a8cc0;
+    --terracotta:#d99a74;
+    --sky:#c9dde4;
+    --butter:#f3dfa2;
+    --shadow:4px 4px 0 var(--ink);
+    --shadow-sm:2px 2px 0 var(--ink);
+    --radius:22px;
+    --dot:radial-gradient(circle, var(--ink) 1px, transparent 1.4px);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:96px}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:"Fraunces", Georgia, serif;
+    font-size:18px;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  /* paper grain */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.05;
+    background-image:var(--dot);background-size:6px 6px;
+  }
+  a{color:inherit}
+  img{max-width:100%;display:block}
+  .pixel{font-family:"VT323", ui-monospace, monospace;letter-spacing:.02em}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:12px;z-index:50;margin:12px auto 0;max-width:1120px;padding:0 20px;
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:var(--paper);border:3px solid var(--ink);border-radius:999px;
+    box-shadow:var(--shadow);padding:6px 10px 6px 18px;
+  }
+  .logo{font-size:26px;text-decoration:none;white-space:nowrap}
+  .logo span{color:var(--rose-deep)}
+  .nav-links{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .nav-links a{
+    font-family:"VT323",monospace;font-size:20px;text-decoration:none;
+    padding:2px 12px;border-radius:999px;border:2px solid transparent;
+  }
+  .nav-links a:hover{border-color:var(--ink);background:var(--matcha)}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:72px 0 120px;overflow:hidden}
+  .sun{
+    position:absolute;right:6%;top:40px;width:260px;height:260px;border-radius:50%;
+    background:var(--butter);border:3px solid var(--ink);
+  }
+  .sun::after{ /* halftone shading */
+    content:"";position:absolute;inset:0;border-radius:50%;
+    background-image:radial-gradient(circle, var(--terracotta) 1.6px, transparent 2px);
+    background-size:9px 9px;
+    -webkit-mask:linear-gradient(135deg, transparent 35%, #000 100%);
+            mask:linear-gradient(135deg, transparent 35%, #000 100%);
+    opacity:.7;
+  }
+  .cloud{
+    position:absolute;background:var(--paper);border:3px solid var(--ink);border-radius:999px;
+    box-shadow:var(--shadow-sm);animation:drift 38s linear infinite;
+  }
+  .cloud::before,.cloud::after{
+    content:"";position:absolute;background:var(--paper);border:3px solid var(--ink);border-bottom:none;border-radius:999px 999px 0 0;
+  }
+  .cloud.c1{width:170px;height:46px;top:70px;left:-200px}
+  .cloud.c1::before{width:70px;height:40px;left:24px;top:-34px}
+  .cloud.c1::after{width:56px;height:30px;left:84px;top:-24px}
+  .cloud.c2{width:120px;height:36px;top:190px;left:-160px;animation-duration:52s;animation-delay:-20s}
+  .cloud.c2::before{width:52px;height:30px;left:18px;top:-26px}
+  .cloud.c2::after{display:none}
+  @keyframes drift{to{transform:translateX(calc(100vw + 400px))}}
+
+  .hero-copy{position:relative;max-width:660px}
+  .chip{
+    display:inline-block;font-family:"VT323",monospace;font-size:19px;
+    background:var(--lavender);border:2px solid var(--ink);border-radius:999px;
+    padding:2px 14px;box-shadow:var(--shadow-sm);
+  }
+  h1{
+    font-size:clamp(44px, 8vw, 92px);line-height:.98;margin:22px 0 18px;font-weight:700;
+    letter-spacing:-.02em;
+  }
+  h1 em{font-style:italic;font-weight:400;color:var(--matcha-deep)}
+  .hl{
+    background-image:linear-gradient(transparent 58%, var(--rose) 58%);
+    padding:0 .08em;
+  }
+  .lede{font-size:21px;color:var(--ink-soft);max-width:560px}
+  .btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}
+  .btn{
+    font-family:"VT323",monospace;font-size:23px;text-decoration:none;
+    padding:8px 22px;border:3px solid var(--ink);border-radius:14px;background:var(--matcha);
+    box-shadow:var(--shadow);transition:transform .15s, box-shadow .15s;
+  }
+  .btn.alt{background:var(--paper)}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
+  .btn:active{transform:translate(2px,2px);box-shadow:var(--shadow-sm)}
+
+  .hills{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:150px}
+
+  /* fireflies */
+  .fly{
+    position:absolute;width:7px;height:7px;border-radius:50%;background:var(--butter);
+    box-shadow:0 0 10px 3px rgba(243,223,162,.9);opacity:.0;animation:glow 6s ease-in-out infinite;
+  }
+  @keyframes glow{
+    0%,100%{opacity:0;transform:translate(0,0)}
+    40%{opacity:1}
+    50%{transform:translate(18px,-24px)}
+    80%{opacity:.6}
+  }
+
+  /* ---------- section heads ---------- */
+  section{position:relative;padding:72px 0}
+  .kicker{font-family:"VT323",monospace;font-size:22px;color:var(--rose-deep)}
+  h2{font-size:clamp(34px,5vw,56px);line-height:1.05;margin:4px 0 28px;letter-spacing:-.01em}
+  h2 em{font-weight:400;color:var(--lavender-deep)}
+
+  /* ---------- story ---------- */
+  .story{background:var(--paper);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+  .chapters{display:grid;gap:34px}
+  .chapter{
+    display:grid;grid-template-columns:120px 1fr;gap:26px;align-items:start;
+  }
+  .chapter .num{
+    width:110px;height:110px;border-radius:46% 54% 50% 50% / 55% 45% 55% 45%;
+    border:3px solid var(--ink);box-shadow:var(--shadow);display:grid;place-items:center;
+    font-family:"VT323",monospace;font-size:40px;position:relative;overflow:hidden;
+  }
+  .chapter .num::after{
+    content:"";position:absolute;inset:0;background-image:var(--dot);background-size:7px 7px;opacity:.18;
+  }
+  .chapter:nth-child(1) .num{background:var(--terracotta)}
+  .chapter:nth-child(2) .num{background:var(--lavender)}
+  .chapter:nth-child(3) .num{background:var(--sky)}
+  .chapter:nth-child(4) .num{background:var(--matcha)}
+  .chapter:nth-child(5) .num{background:var(--rose)}
+  .page{
+    background:var(--parchment);border:3px solid var(--ink);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px 26px;position:relative;
+  }
+  .page h3{font-size:28px;margin:0 0 2px;line-height:1.15}
+  .page .meta{font-family:"VT323",monospace;font-size:20px;color:var(--ink-soft);margin-bottom:10px}
+  .page p{margin:0 0 10px}
+  .page ul{margin:6px 0 0;padding-left:20px}
+  .page li{margin:4px 0}
+  .tag{
+    display:inline-block;font-family:"VT323",monospace;font-size:17px;
+    border:2px solid var(--ink);border-radius:8px;padding:0 8px;margin:4px 6px 0 0;background:var(--paper);
+  }
+
+  /* ---------- workshop ---------- */
+  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+  .filter{
+    font-family:"VT323",monospace;font-size:21px;cursor:pointer;color:var(--ink);
+    background:var(--paper);border:3px solid var(--ink);border-radius:999px;padding:3px 18px;
+    box-shadow:var(--shadow-sm);transition:transform .12s;
+  }
+  .filter:hover{transform:translateY(-2px)}
+  .filter[aria-pressed="true"]{background:var(--ink);color:var(--parchment)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px}
+  .card{
+    background:var(--paper);border:3px solid var(--ink);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;
+    transition:transform .2s, box-shadow .2s, opacity .25s;
+  }
+  .card:hover{transform:translate(-3px,-3px) rotate(-.4deg);box-shadow:7px 7px 0 var(--ink)}
+  .card.hide{display:none}
+  .thumb{
+    aspect-ratio:16/10;border-bottom:3px solid var(--ink);position:relative;overflow:hidden;
+    display:grid;place-items:center;
+  }
+  .thumb img{width:100%;height:100%;object-fit:cover}
+  .thumb::after{ /* halftone wash on hover */
+    content:"";position:absolute;inset:0;background-image:var(--dot);background-size:6px 6px;
+    opacity:0;transition:opacity .25s;mix-blend-mode:multiply;
+  }
+  .card:hover .thumb::after{opacity:.22}
+  .thumb.art{background:var(--sky)}
+  .thumb.art.m{background:var(--matcha)}
+  .thumb.art.r{background:var(--rose)}
+  .thumb.art.l{background:var(--lavender)}
+  .thumb.art.t{background:var(--terracotta)}
+  .thumb.art.b{background:var(--butter)}
+  .thumb .glyph{font-family:"VT323",monospace;font-size:64px;line-height:1;position:relative;z-index:1}
+  .thumb .halftone{
+    position:absolute;inset:0;
+    background-image:radial-gradient(circle, rgba(59,47,42,.35) 1.4px, transparent 1.8px);
+    background-size:10px 10px;
+    -webkit-mask:radial-gradient(circle at 70% 30%, transparent 25%, #000 75%);
+            mask:radial-gradient(circle at 70% 30%, transparent 25%, #000 75%);
+  }
+  .card-body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .card h3{margin:0;font-size:23px;line-height:1.2}
+  .card p{margin:0;font-size:16px;color:var(--ink-soft)}
+  .card .row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:auto;padding-top:8px}
+  .badge{font-family:"VT323",monospace;font-size:17px;border:2px solid var(--ink);border-radius:8px;padding:0 8px}
+  .badge.code{background:var(--lavender)}
+  .badge.gamedev{background:var(--matcha)}
+  .badge.photo{background:var(--rose)}
+  .badge.video{background:var(--butter)}
+  .badge.win{background:var(--terracotta)}
+  .card a.more{font-family:"VT323",monospace;font-size:19px;margin-left:auto}
+  .soon p{font-style:italic}
+
+  /* ---------- spellbook (terminal) ---------- */
+  .term{
+    background:var(--ink);color:var(--parchment);border:3px solid var(--ink);border-radius:var(--radius);
+    box-shadow:6px 6px 0 var(--matcha-deep);overflow:hidden;
+  }
+  .term-bar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:#4a3c35}
+  .term-bar i{width:13px;height:13px;border-radius:50%;border:2px solid var(--parchment);display:block}
+  .term-bar i:nth-child(1){background:var(--rose)}
+  .term-bar i:nth-child(2){background:var(--butter)}
+  .term-bar i:nth-child(3){background:var(--matcha)}
+  .term-bar span{font-family:"VT323",monospace;font-size:18px;margin-left:8px;opacity:.85}
+  .term pre{
+    margin:0;padding:18px 22px 22px;font-family:"VT323",monospace;font-size:21px;line-height:1.35;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .term .p{color:var(--matcha)}
+  .term .k{color:var(--rose)}
+  .term .c{color:#b7a99e}
+  .cursor{display:inline-block;width:10px;height:20px;background:var(--parchment);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  /* ---------- contact ---------- */
+  .letter{
+    background:var(--paper);border:3px solid var(--ink);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:34px;display:grid;grid-template-columns:1.3fr 1fr;gap:30px;align-items:center;position:relative;overflow:hidden;
+  }
+  .letter::before{
+    content:"";position:absolute;right:-60px;bottom:-60px;width:240px;height:240px;border-radius:50%;
+    background-image:radial-gradient(circle, var(--matcha-deep) 1.5px, transparent 1.9px);background-size:10px 10px;opacity:.35;
+  }
+  .links{display:grid;gap:12px;position:relative}
+  .links a{
+    display:flex;justify-content:space-between;align-items:center;text-decoration:none;
+    font-family:"VT323",monospace;font-size:23px;border:3px solid var(--ink);border-radius:14px;
+    padding:6px 16px;background:var(--parchment);box-shadow:var(--shadow-sm);transition:transform .15s;
+  }
+  .links a:hover{transform:translateX(4px);background:var(--matcha)}
+
+  footer{padding:40px 0 60px;text-align:center;font-family:"VT323",monospace;font-size:19px;color:var(--ink-soft)}
+
+  /* ---------- reveal on scroll ---------- */
+  .reveal{opacity:0;transform:translateY(18px);transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:760px){
+    body{font-size:17px}
+    .sun{width:150px;height:150px;right:-30px;top:20px}
+    .nav-links a{font-size:18px;padding:2px 8px}
+    .logo{font-size:22px}
+    .chapter{grid-template-columns:1fr;gap:14px}
+    .chapter .num{width:76px;height:76px;font-size:30px}
+    .letter{grid-template-columns:1fr;padding:24px}
+    .grid{grid-template-columns:1fr}
+  }
+  @media (max-width:520px){ .nav-links a.opt{display:none} }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body>
+
+<nav aria-label="Main">
+  <div class="nav-inner">
+    <a class="logo pixel" href="#top">george<span>.li</span></a>
+    <div class="nav-links">
+      <a href="#story">story</a>
+      <a href="#workshop">workshop</a>
+      <a class="opt" href="#spellbook">spellbook</a>
+      <a href="#hello">say hi</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<header class="hero" id="top">
+  <div class="sun" aria-hidden="true"></div>
+  <div class="cloud c1" aria-hidden="true"></div>
+  <div class="cloud c2" aria-hidden="true"></div>
+  <div class="fly" style="left:12%;top:62%" aria-hidden="true"></div>
+  <div class="fly" style="left:38%;top:74%;animation-delay:-2s" aria-hidden="true"></div>
+  <div class="fly" style="left:64%;top:66%;animation-delay:-4s" aria-hidden="true"></div>
+  <div class="fly" style="left:84%;top:78%;animation-delay:-1s" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="hero-copy reveal">
+      <span class="chip">CS Honors @ Purdue · prev. Sola AI (YC S23), Subaru</span>
+      <h1>George Li <em>builds</em><br><span class="hl">small worlds.</span></h1>
+      <p class="lede">
+        Once upon a time in the Arizona desert, a kid started making things on a computer.
+        These days that means AI agents, factory-floor dashboards, flight routes for drones,
+        and video games on Roblox, plus the photos and films I make in between.
+      </p>
+      <div class="btns">
+        <a class="btn" href="#story">read the story →</a>
+        <a class="btn alt" href="#workshop">open the workshop</a>
+      </div>
+    </div>
+  </div>
+
+  <svg class="hills" viewBox="0 0 1440 150" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <pattern id="dots" width="9" height="9" patternUnits="userSpaceOnUse">
+        <circle cx="2" cy="2" r="1.4" fill="#3b2f2a" opacity=".22"/>
+      </pattern>
+    </defs>
+    <path d="M0,90 C180,30 330,40 520,80 C700,120 860,40 1040,50 C1220,60 1330,100 1440,80 L1440,150 L0,150 Z" fill="#b9cba0" stroke="#3b2f2a" stroke-width="3"/>
+    <path d="M0,90 C180,30 330,40 520,80 C700,120 860,40 1040,50 C1220,60 1330,100 1440,80 L1440,150 L0,150 Z" fill="url(#dots)"/>
+    <path d="M0,120 C220,90 420,110 640,125 C860,140 1100,95 1440,115 L1440,150 L0,150 Z" fill="#7f9a6a" stroke="#3b2f2a" stroke-width="3"/>
+  </svg>
+</header>
+
+<!-- ==================== STORY ==================== -->
+<section class="story" id="story">
+  <div class="wrap">
+    <div class="kicker reveal">✦ the story so far</div>
+    <h2 class="reveal">Five chapters, <em>one curious kid.</em></h2>
+
+    <div class="chapters">
+      <article class="chapter reveal">
+        <div class="num" aria-hidden="true">01</div>
+        <div class="page">
+          <h3>The desert lab</h3>
+          <div class="meta">Tucson, AZ · summer 2023 · UArizona Autonomous Vehicle Lab</div>
+          <p>My first real research job: teaching self-driving cars to <em>doubt</em> what they see.
+            I designed GPS-spoofing attacks against connected autonomous vehicles in simulation:</p>
+          <ul>
+            <li>phantom pedestrians that forced emergency stops</li>
+            <li>fake velocity data that made trailing cars see a stalled obstacle</li>
+            <li>position pivoting at intersections that triggered false traffic violations</li>
+          </ul>
+          <span class="tag">CARLA</span><span class="tag">OpenCDA</span><span class="tag">COOPERNAUT</span>
+        </div>
+      </article>
+
+      <article class="chapter reveal">
+        <div class="num" aria-hidden="true">02</div>
+        <div class="page">
+          <h3>The big city</h3>
+          <div class="meta">New York · 2025 · Forward Deployed Engineering Intern, Sola AI (YC S23)</div>
+          <p>Joined a Y Combinator startup building AI agents that do people's tedious computer work.
+            I built agentic browser automations for enterprise clients, LLM evaluation harnesses that
+            cut error rates by 15%, and led Excel automation features for the desktop release, all
+            while the company raised its Series A.</p>
+          <span class="tag">agents</span><span class="tag">LLM evals</span><span class="tag">browser automation</span>
+        </div>
+      </article>
+
+      <article class="chapter reveal">
+        <div class="num" aria-hidden="true">03</div>
+        <div class="page">
+          <h3>The assembly line</h3>
+          <div class="meta">Lafayette, IN · summer 2026 · Production Systems App Dev Intern, Subaru</div>
+          <p>Software you can hear: the dashboards on a live car-assembly floor.
+            I migrated 50+ legacy ASP.NET WebForms line monitors to Razor Pages in C#,
+            cutting over production-critical screens with zero downtime.</p>
+          <span class="tag">C#</span><span class="tag">ASP.NET</span><span class="tag">zero-downtime</span>
+        </div>
+      </article>
+
+      <article class="chapter reveal">
+        <div class="num" aria-hidden="true">04</div>
+        <div class="page">
+          <h3>The sky routes</h3>
+          <div class="meta">West Lafayette · 2026 – now · Data Science Researcher, The Data Mine × RTX</div>
+          <p>Teaching unmanned aircraft to find their way. I'm building a 3D simulation environment and
+            using path-planning algorithms to generate training data for an ML model that plans fast,
+            safe obstacle-avoiding flight routes.</p>
+          <span class="tag">ML</span><span class="tag">3D sim</span><span class="tag">path planning</span>
+        </div>
+      </article>
+
+      <article class="chapter reveal">
+        <div class="num" aria-hidden="true">05</div>
+        <div class="page">
+          <h3>The worlds I build for fun</h3>
+          <div class="meta">evenings & weekends · always</div>
+          <p>Games, hackathons and pro-bono work. I shipped a published Roblox tycoon game, won
+            OregonHacks with a plant-identification app, and designed a logistics platform for a
+            nonprofit that builds shelter pods for people without homes. The workshop below has all of it.</p>
+          <span class="tag">Roblox</span><span class="tag">Godot</span><span class="tag">React</span><span class="tag">Figma</span>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== WORKSHOP ==================== -->
+<section id="workshop">
+  <div class="wrap">
+    <div class="kicker reveal">✦ the workshop</div>
+    <h2 class="reveal">Things I've made, <em>sorted by mood.</em></h2>
+
+    <div class="filters reveal" role="group" aria-label="Filter projects">
+      <button class="filter" data-filter="all" aria-pressed="true">all</button>
+      <button class="filter" data-filter="code" aria-pressed="false">coding</button>
+      <button class="filter" data-filter="gamedev" aria-pressed="false">game dev</button>
+      <button class="filter" data-filter="photo" aria-pressed="false">photography</button>
+      <button class="filter" data-filter="video" aria-pressed="false">videography</button>
+    </div>
+
+    <!--
+      HOW TO ADD A PROJECT
+      1. Copy any <article class="card" ...> block below and paste it where you want it.
+      2. Set data-cat to one of: code, gamedev, photo, video  (this drives the filter buttons).
+      3. Put your image in the /assets folder and point <img src="assets/your-file.jpg"> at it,
+         or keep a <div class="thumb art ..."> placeholder (colors: m r l t b).
+      4. Update the title, the one-line description, badges and link. Commit, and the site updates in ~1 minute.
+    -->
+    <div class="grid" id="grid">
+
+      <!-- ===== GAME DEV ===== -->
+      <article class="card reveal" data-cat="gamedev">
+        <div class="thumb"><img src="assets/rave-1_club.jpg" alt="Rave Tycoon: neon club floor built from above" loading="lazy"></div>
+        <div class="card-body">
+          <h3>Rave Tycoon</h3>
+          <p>A published Roblox tycoon: build your own nightclub from an empty lot to a rooftop festival. Economy, progression, monetization and analytics, all scripted in Luau.</p>
+          <div class="row"><span class="badge gamedev">game dev</span><span class="badge">Roblox · Luau</span>
+            <a class="more" href="https://www.roblox.com/games/123458257241508" target="_blank" rel="noopener">play ↗</a></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="gamedev">
+        <div class="thumb"><img src="assets/rave-5_rooftop.jpg" alt="Rave Tycoon rooftop stage at night" loading="lazy"></div>
+        <div class="card-body">
+          <h3>Rave Tycoon · the rooftop</h3>
+          <p>Late-game unlock: the rooftop stage. Every area is its own little set piece with lighting, props and a reason to come back.</p>
+          <div class="row"><span class="badge gamedev">game dev</span><span class="badge">level design</span></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="gamedev">
+        <div class="thumb art m"><div class="halftone"></div><span class="glyph" aria-hidden="true">✿ ▸</span></div>
+        <div class="card-body">
+          <h3>Frusion</h3>
+          <p>Where it started: learning the Godot engine for my CS50 final project.</p>
+          <div class="row"><span class="badge gamedev">game dev</span><span class="badge">Godot</span>
+            <a class="more" href="https://github.com/george5li/Frusion" target="_blank" rel="noopener">code ↗</a></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="gamedev">
+        <div class="thumb art l"><div class="halftone"></div><span class="glyph" aria-hidden="true">◆ ◆</span></div>
+        <div class="card-body">
+          <h3>Dumpster Dive</h3>
+          <p>A Godot game project written in GDScript.</p>
+          <div class="row"><span class="badge gamedev">game dev</span><span class="badge">Godot · GDScript</span>
+            <a class="more" href="https://github.com/george5li/DumpsterDive" target="_blank" rel="noopener">code ↗</a></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="gamedev">
+        <div class="thumb art t"><div class="halftone"></div><span class="glyph" aria-hidden="true">ʕ•ᴥ•ʔ</span></div>
+        <div class="card-body">
+          <h3>Dyno</h3>
+          <p>Another Godot experiment in GDScript.</p>
+          <div class="row"><span class="badge gamedev">game dev</span><span class="badge">Godot · GDScript</span>
+            <a class="more" href="https://github.com/george5li/Dyno" target="_blank" rel="noopener">code ↗</a></div>
+        </div>
+      </article>
+
+      <!-- ===== CODING ===== -->
+      <article class="card reveal" data-cat="code">
+        <div class="thumb art m"><div class="halftone"></div><span class="glyph" aria-hidden="true">❀</span></div>
+        <div class="card-body">
+          <h3>Memoflora</h3>
+          <p>Point your phone at a plant and learn its name. A full-stack PWA with AI species ID, conservation-status scoring and a live regional biodiversity map.</p>
+          <div class="row"><span class="badge win">🏆 OregonHacks winner</span><span class="badge code">coding</span><span class="badge">React · Supabase</span></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="code">
+        <div class="thumb art r"><div class="halftone"></div><span class="glyph" aria-hidden="true">⌂</span></div>
+        <div class="card-body">
+          <h3>Sleep Pod platform</h3>
+          <p>Pro-bono coordination platform for a UK nonprofit that builds shelter pods inside prisons for homeless and refugee communities. I was the sole UI/UX designer.</p>
+          <div class="row"><span class="badge code">coding</span><span class="badge">UI/UX · Figma</span></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="code">
+        <div class="thumb art b"><div class="halftone"></div><span class="glyph" aria-hidden="true">⇢ ✈</span></div>
+        <div class="card-body">
+          <h3>Sky routes (research)</h3>
+          <p>ML route planning for unmanned aircraft with RTX through Purdue's Data Mine: 3D simulation plus path-planning training data.</p>
+          <div class="row"><span class="badge code">coding</span><span class="badge">ML · simulation</span></div>
+        </div>
+      </article>
+
+      <article class="card reveal" data-cat="code">
+        <div class="thumb art l"><div class="halftone"></div><span class="glyph" aria-hidden="true">⚠ ⇄</span></div>
+        <div class="card-body">
+          <h3>Phantom traffic (research)</h3>
+          <p>Three GPS-spoofing attack scenarios against connected self-driving cars, with mitigations presented to faculty researchers.</p>
+          <div class="row"><span class="badge code">coding</span><span class="badge">security · CARLA</span></div>
+        </div>
+      </article>
+
+      <!-- ===== PHOTOGRAPHY (add your shots: swap the placeholder for <img src="assets/..."> ) ===== -->
+      <article class="card reveal soon" data-cat="photo">
+        <div class="thumb art r"><div class="halftone"></div><span class="glyph" aria-hidden="true">◐</span></div>
+        <div class="card-body">
+          <h3>Roll no. 1 — developing…</h3>
+          <p>Photos coming soon. This frame is waiting for its first print.</p>
+          <div class="row"><span class="badge photo">photography</span></div>
+        </div>
+      </article>
+
+      <article class="card reveal soon" data-cat="photo">
+        <div class="thumb art b"><div class="halftone"></div><span class="glyph" aria-hidden="true">☼</span></div>
+        <div class="card-body">
+          <h3>Desert light — developing…</h3>
+          <p>Photos coming soon.</p>
+          <div class="row"><span class="badge photo">photography</span></div>
+        </div>
+      </article>
+
+      <!-- ===== VIDEOGRAPHY (add YouTube/Vimeo: replace the thumb with an <iframe> or a linked thumbnail) ===== -->
+      <article class="card reveal soon" data-cat="video">
+        <div class="thumb art m"><div class="halftone"></div><span class="glyph" aria-hidden="true">▶</span></div>
+        <div class="card-body">
+          <h3>Reel — in the edit bay</h3>
+          <p>Films coming soon.</p>
+          <div class="row"><span class="badge video">videography</span></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SPELLBOOK ==================== -->
+<section id="spellbook" style="padding-top:20px">
+  <div class="wrap">
+    <div class="kicker reveal">✦ the spellbook</div>
+    <h2 class="reveal">Tools I reach for, <em>in order of trust.</em></h2>
+    <div class="term reveal" role="region" aria-label="Skills, shown as a terminal">
+      <div class="term-bar"><i></i><i></i><i></i><span>~/george — spellbook</span></div>
+<pre><span class="p">george@purdue</span> <span class="k">~</span> $ cat spells.txt
+<span class="c"># languages</span>
+python · java · c · c# · javascript · typescript · sql · luau · gdscript
+
+<span class="c"># frameworks & tools</span>
+react · vite · node/express · supabase · .net / razor pages
+selenium · git · figma · roblox studio · godot · carla
+
+<span class="c"># ai & automation</span>
+agentic workflows · llm evaluation · browser automation · claude api
+
+<span class="p">george@purdue</span> <span class="k">~</span> $ <span class="cursor"></span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTACT ==================== -->
+<section id="hello">
+  <div class="wrap">
+    <div class="letter reveal">
+      <div>
+        <div class="kicker">✦ the last page</div>
+        <h2 style="margin-bottom:12px">Let's make <em>something.</em></h2>
+        <p style="margin:0;color:var(--ink-soft)">I'm looking for Summer 2027 internships in software, AI and forward-deployed engineering,
+          and I'm always happy to talk games, photos or weird side projects.</p>
+      </div>
+      <div class="links">
+        <a href="mailto:li5517@purdue.edu">email <span>✉</span></a>
+        <a href="https://www.linkedin.com/in/georgecli/" target="_blank" rel="noopener">linkedin <span>↗</span></a>
+        <a href="https://github.com/george5li" target="_blank" rel="noopener">github <span>↗</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>made by hand (and a little magic) in Tucson & West Lafayette · © <span id="yr">2026</span> George Li</footer>
+
+<script>
+  // filter buttons
+  const buttons = document.querySelectorAll('.filter');
+  const cards = document.querySelectorAll('.card');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    const f = btn.dataset.filter;
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+    cards.forEach(c => c.classList.toggle('hide', f !== 'all' && c.dataset.cat !== f));
+  }));
+
+  // reveal on scroll
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 }) : null;
+  document.querySelectorAll('.reveal').forEach(el => io ? io.observe(el) : el.classList.add('in'));
+
+  document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
