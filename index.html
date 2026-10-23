@@ -87,7 +87,7 @@
   }
   .cloud{
     position:absolute;background:var(--paper);border:3px solid var(--ink);border-radius:999px;
-    box-shadow:var(--shadow-sm);animation:drift 38s linear infinite;
+    box-shadow:var(--shadow-sm);animation:drift 38s linear infinite;z-index:0;opacity:.9;
   }
   .cloud::before,.cloud::after{
     content:"";position:absolute;background:var(--paper);border:3px solid var(--ink);border-bottom:none;border-radius:999px 999px 0 0;
@@ -100,7 +100,7 @@
   .cloud.c2::after{display:none}
   @keyframes drift{to{transform:translateX(calc(100vw + 400px))}}
 
-  .hero-copy{position:relative;max-width:660px}
+  .hero-copy{position:relative;z-index:2;max-width:660px}
   .chip{
     display:inline-block;font-family:"VT323",monospace;font-size:19px;
     background:var(--lavender);border:2px solid var(--ink);border-radius:999px;
